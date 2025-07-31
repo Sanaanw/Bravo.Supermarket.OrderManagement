@@ -1,0 +1,6 @@
+@Bravo.Supermarket.API_HostAddress = http://localhost:5028
+
+GET {{Bravo.Supermarket.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

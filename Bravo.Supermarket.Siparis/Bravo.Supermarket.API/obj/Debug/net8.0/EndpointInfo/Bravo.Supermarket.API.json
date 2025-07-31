@@ -1,0 +1,205 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Bravo.Supermarket.API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/Check/Barkodlar": {
+      "get": {
+        "tags": [
+          "Check"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Operation/ReceiveOrder": {
+      "post": {
+        "tags": [
+          "Operation"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Operation": {
+      "get": {
+        "tags": [
+          "Operation"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderDto": {
+        "type": "object",
+        "properties": {
+          "header": {
+            "$ref": "#/components/schemas/OrderHeaderDto"
+          },
+          "parties": {
+            "$ref": "#/components/schemas/OrderPartyDto"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineDto"
+            },
+            "nullable": true
+          },
+          "totalLines": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderHeaderDto": {
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderCurrency": {
+            "type": "string",
+            "nullable": true
+          },
+          "expectedDeliveryDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "additionalRemarks": {
+            "type": "string",
+            "nullable": true
+          },
+          "testInformation": {
+            "type": "string",
+            "nullable": true
+          },
+          "contractNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "paymentTerms": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderLineDto": {
+        "type": "object",
+        "properties": {
+          "lineNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ean": {
+            "type": "string",
+            "nullable": true
+          },
+          "buyerItemCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "itemDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "itemType": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderedQuantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "freeOrderedQuantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "orderedUnitPacksize": {
+            "type": "number",
+            "format": "double"
+          },
+          "unitOfMeasure": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderedUnitNetPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "scheduledQuantity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderPartyDto": {
+        "type": "object",
+        "properties": {
+          "buyerILN": {
+            "type": "string",
+            "nullable": true
+          },
+          "sellerILN": {
+            "type": "string",
+            "nullable": true
+          },
+          "codeByBuyer": {
+            "type": "string",
+            "nullable": true
+          },
+          "deliveryPointILN": {
+            "type": "string",
+            "nullable": true
+          },
+          "deliveryPointName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

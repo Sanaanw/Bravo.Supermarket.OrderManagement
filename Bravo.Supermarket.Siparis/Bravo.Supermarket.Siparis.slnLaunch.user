@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BravoSupermarket.Siparis.WinForm\\BravoSupermarket.Siparis.WinForm.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
