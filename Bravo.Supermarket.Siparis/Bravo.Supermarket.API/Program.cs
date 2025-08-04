@@ -1,5 +1,7 @@
 
 using Bravo.Supermarket.API.Data;
+using Bravo.Supermarket.API.Parametrs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bravo.Supermarket.API
 {
@@ -14,20 +16,16 @@ namespace Bravo.Supermarket.API
             // Add services to the container.
             builder.Services.AddDbContext<AppDbContext>();
 
-
             builder.Services.AddControllers();
+        //    builder.Services.AddDbContext<AppDbContext>(options =>
+   // options.UseSqlServer(builder.Configuration.GetConnectionString("con_string")));
+            builder.Services.AddScoped<sql_operation>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
 
             app.UseHttpsRedirection();
 

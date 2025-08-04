@@ -1,25 +1,5 @@
 [
   {
-    "ContainingType": "Bravo.Supermarket.API.Controllers.CheckController",
-    "Method": "GetBarkodlar",
-    "RelativePath": "api/Check/Barkodlar",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Bravo.Supermarket.API.Controllers.OperationController",
-    "Method": "GetOrders",
-    "RelativePath": "api/Operation",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "Bravo.Supermarket.API.Controllers.OperationController",
     "Method": "ReceiveOrder",
     "RelativePath": "api/Operation/ReceiveOrder",
@@ -31,6 +11,11 @@
         "Name": "orderDto",
         "Type": "Bravo.Supermarket.API.Dto.Xml.OrderDto",
         "IsRequired": true
+      },
+      {
+        "Name": "mesmer_code",
+        "Type": "System.String",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

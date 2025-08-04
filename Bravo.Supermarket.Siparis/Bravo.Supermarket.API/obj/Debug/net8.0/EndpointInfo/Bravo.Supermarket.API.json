@@ -5,22 +5,19 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Check/Barkodlar": {
-      "get": {
-        "tags": [
-          "Check"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Operation/ReceiveOrder": {
       "post": {
         "tags": [
           "Operation"
+        ],
+        "parameters": [
+          {
+            "name": "mesmer_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
           "content": {
@@ -41,18 +38,6 @@
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Operation": {
-      "get": {
-        "tags": [
-          "Operation"
-        ],
         "responses": {
           "200": {
             "description": "OK"

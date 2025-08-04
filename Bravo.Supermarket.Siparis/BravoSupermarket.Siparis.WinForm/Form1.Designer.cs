@@ -76,6 +76,9 @@ namespace BravoSupermarket.Siparis.WinForm
                     if (response.IsSuccessStatusCode)
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
+
+                        listBox2.Items.Add(filePath);
+
                         MessageBox.Show("Sifariş uğurla göndərildi!\n" + responseBody,
                                         "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -134,7 +137,7 @@ namespace BravoSupermarket.Siparis.WinForm
             button2.Location = new Point(650, 30);
             button2.Size = new Size(200, 50);
             button2.Name = "button2";
-            button2.TabIndex = 1;
+            button2.TabIndex = 1; 
             button2.Text = "İcra edin.";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
