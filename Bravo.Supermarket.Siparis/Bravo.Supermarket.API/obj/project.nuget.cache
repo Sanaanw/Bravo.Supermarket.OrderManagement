@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bRIk0WBlD6s=",
+  "dgSpecHash": "CM9mX3NeQrY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\BravoSupermarketTinda\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
+  "projectFilePath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ASUS\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

@@ -19,6 +19,7 @@ namespace BravoSupermarket.Siparis.WinForm
         private System.ComponentModel.IContainer components = null;
         private Button button1;
         private Button button2;
+        private TextBox textBox1;
         private ListBox listBox1;
         private ListBox listBox2;
         private OpenFileDialog openFileDialog1;
@@ -28,7 +29,7 @@ namespace BravoSupermarket.Siparis.WinForm
             InitializeComponent();
             _httpClient = new HttpClient
             {
-                BaseAddress = new Uri("https://localhost:7164/") // API əsas ünvanı
+                BaseAddress = new Uri("https://localhost:7164/") 
             };
             _httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -59,9 +60,11 @@ namespace BravoSupermarket.Siparis.WinForm
                 return;
             }
 
-
             try
             {
+                string mesmerCode = textBox1.Text;
+
+
                 foreach (var item in listBox1.Items)
                 {
 
@@ -71,7 +74,10 @@ namespace BravoSupermarket.Siparis.WinForm
 
                     var jsonContent = JsonConvert.SerializeObject(orderDto);
                     var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                    var response = await _httpClient.PostAsync("api/Operation/ReceiveOrder", content);
+
+                    string url = $"api/Operation/ReceiveOrder?mesmer_code={Uri.EscapeDataString(mesmerCode)}";
+
+                    var response = await _httpClient.PostAsync(url, content);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -141,6 +147,22 @@ namespace BravoSupermarket.Siparis.WinForm
             button2.Text = "İcra edin.";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
+
+            Label label3 = new Label();
+            label3.Text = "Mesmer kodu:"; 
+            label3.Location = new Point(50, 10);
+            label3.Size = new Size(200, 20);
+            label3.Font = new Font(label3.Font, FontStyle.Bold);
+            Controls.Add(label3);
+
+            // textBox1
+            textBox1 = new TextBox();
+            textBox1.Location = new Point(50, 30);
+            textBox1.Size = new Size(300, 30);
+            textBox1.Name = "textBox1";
+            textBox1.Font = new Font("Microsoft Sans Serif", 12);
+            Controls.Add(textBox1);
+
 
             // label1
             label1.Location = new Point(50, 95);

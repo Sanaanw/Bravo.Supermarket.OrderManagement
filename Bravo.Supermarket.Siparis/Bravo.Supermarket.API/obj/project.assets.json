@@ -8280,11 +8280,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ASUS\\OneDrive\\Desktop\\BravoSupermarketTinda\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
+      "projectUniqueName": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
       "projectName": "Bravo.Supermarket.API",
-      "projectPath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\BravoSupermarketTinda\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
+      "projectPath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj",
       "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\BravoSupermarketTinda\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\obj\\",
+      "outputPath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -8370,7 +8370,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
