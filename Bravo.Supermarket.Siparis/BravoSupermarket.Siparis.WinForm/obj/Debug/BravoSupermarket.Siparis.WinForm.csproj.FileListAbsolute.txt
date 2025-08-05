@@ -120,7 +120,6 @@ C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermark
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\bin\Debug\System.Numerics.Vectors.xml
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.csproj.AssemblyReference.cache
-C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.exe.config
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.Properties.Resources.resources
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.csproj.GenerateResource.cache
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.csproj.CoreCompileInputs.cache

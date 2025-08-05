@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Bravo.Supermarket.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+faec351dbd7c8a03f8f95ecff5e5fe2de393e4e3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37cd089a43013fc2cad881a00ba7ba36c50ad01a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Bravo.Supermarket.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Bravo.Supermarket.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

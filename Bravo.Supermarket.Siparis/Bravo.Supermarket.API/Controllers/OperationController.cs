@@ -29,7 +29,7 @@ namespace Bravo.Supermarket.API.Controllers
         }
 
         [HttpPost("ReceiveOrder")]
-        public IActionResult ReceiveOrder([FromBody] OrderDto orderDto,string mesmer_code)
+        public IActionResult ReceiveOrder([FromBody] OrderDto orderDto, string mesmer_code)
         {
             ERP_CONFIG();
 
@@ -82,14 +82,89 @@ namespace Bravo.Supermarket.API.Controllers
                             if (gettingCariHesapAdresleri == null)
                                 return BadRequest("Cari Hesap Adresləri tapılmadı.");
 
+
+
+
+                            //Getting Fiyat
+
+                            string fiyatQuery = $@"
+    SELECT TOP 1 price FROM (
+        SELECT IT.sto_kod AS item_code, '' AS cl_specode, ROUND(ISNULL(PR.sfiyat_fiyati, 0), 4) AS price
+        FROM {_DB_Name}..STOK_SATIS_FIYAT_LISTELERI PR
+        LEFT JOIN {_DB_Name}..STOKLAR IT ON IT.sto_kod = PR.sfiyat_stokkod
+        WHERE PR.sfiyat_listesirano = 1 AND IT.sto_kod IS NOT NULL
+
+        UNION ALL
+
+        SELECT ST.sat_stok_kod AS item_code, ST.sat_cari_kod AS cl_specode, ROUND(ISNULL(ST.sat_brut_fiyat, 0), 4) AS price
+        FROM {_DB_Name}..SATIS_SARTLARI ST
+        WHERE GETDATE() BETWEEN ST.sat_basla_tarih AND ST.sat_bitis_tarih
+    ) AS V
+    WHERE V.item_code = N'" + gettingBarkodTanimlar.bar_stokkodu + @"' 
+      AND (V.cl_specode = N'" + orderDto.Header.OrderNumber + @"' OR V.cl_specode = '')
+";
+
+                            double Getting_sip_b_fiyat = 0;
+
+                            using (SqlCommand fiyatCmd = new SqlCommand(fiyatQuery, con_logo, transaction))
+                            {
+                                object result = fiyatCmd.ExecuteScalar();
+                                if (result != null && double.TryParse(result.ToString(), out double parsedPrice))
+                                {
+                                    Getting_sip_b_fiyat = parsedPrice;
+                                }
+                            }
+
+
+
+
+                            //Getting Opno
+                            int Getting_cariOdemePlani = 0;
+
+                            string cariOdemePlaniquery = $@"
+                                    SELECT TOP 1 cari_odemeplan_no 
+                                   FROM {_DB_Name}..CARI_HESAPLAR 
+                                     WHERE cari_kod LIKE N'%{gettingCariHesablar.cari_kod}%'";
+
+
+                            using (SqlCommand cariOdemePlaniCmd = new SqlCommand(cariOdemePlaniquery, con_logo, transaction))
+                            {
+                                object result = cariOdemePlaniCmd.ExecuteScalar();
+                                if (result != null && int.TryParse(result.ToString(), out int parsedPlan))
+                                {
+                                    Getting_cariOdemePlani = parsedPlan;
+                                }
+                            }
+
+
+
+                            float Getting_Iskonto = 10;
+
+                            //Getting Iskonto1
+                            string iskontoQuery = $@"
+                                  SELECT cari_POS_ongIskOran 
+                                      FROM {_DB_Name}..CARI_HESAPLAR 
+                                           WHERE cari_kod LIKE N'%{gettingCariHesablar.cari_kod}%'";
+
+
+                            using (SqlCommand iskontoCmd = new SqlCommand(iskontoQuery, con_logo, transaction))
+                            {
+                                object result = iskontoCmd.ExecuteScalar();
+                                if (result != null && float.TryParse(result.ToString(), out float parsedPlan))
+                                {
+                                    Getting_Iskonto = parsedPlan;
+                                }
+                            }
+
+
                             SendingOrderDto sendingOrderDto = new SendingOrderDto
                             {
                                 sip_stok_kod = gettingBarkodTanimlar.bar_stokkodu,
                                 sip_miktar = line.OrderedQuantity,
                                 sip_satici_kod = gettingCariHesapAdresleri.adr_temsilci_kodu,
-                                sip_b_fiyat = line.OrderedUnitNetPrice,
-                                sip_tutar = line.OrderedUnitNetPrice * line.OrderedQuantity,
-                                sip_iskonto1 = (line.OrderedUnitNetPrice * line.OrderedQuantity) / 4,
+                                sip_b_fiyat = Getting_sip_b_fiyat,
+                                sip_tutar = Getting_sip_b_fiyat * line.OrderedQuantity,
+                                sip_iskonto1 = Getting_Iskonto==0?Getting_sip_b_fiyat:((Getting_sip_b_fiyat*Getting_Iskonto)/100),
                                 sip_depono = 2,
                                 sip_aciklama = orderDto.Header.OrderNumber,
                                 sip_musteri_kod = gettingCariHesablar.cari_kod
@@ -105,8 +180,8 @@ namespace Bravo.Supermarket.API.Controllers
                                     sip_mesmercode,
                                     ficheno_new_seri,
                                     ficheno_new_sira,
-                                    linenr, 
-                                    odemePlaniNo: -14,
+                                    linenr,
+                                    Getting_cariOdemePlani,
                                     command);
                             }
                         }
@@ -134,10 +209,10 @@ namespace Bravo.Supermarket.API.Controllers
             SqlCommand command)
         {
 
-            string query_line = "INSERT INTO " + _DB_Name + "..SIPARISLER  ( sip_RECid_DBCno,sip_RECid_RECno,sip_SpecRECno,sip_iptal,sip_fileid,sip_hidden,sip_kilitli,sip_degisti,sip_checksum,sip_create_user,sip_create_date,sip_lastup_user,sip_lastup_date,sip_special1,sip_special2,sip_special3,sip_firmano,sip_subeno,sip_tarih,sip_teslim_tarih,sip_tip,sip_cins,sip_evrakno_seri,sip_evrakno_sira,sip_satirno,sip_belgeno,sip_belge_tarih,sip_satici_kod,sip_musteri_kod,sip_stok_kod,sip_b_fiyat,sip_miktar,sip_birim_pntr,sip_teslim_miktar,sip_tutar,sip_iskonto_1,sip_iskonto_2,sip_iskonto_3,sip_iskonto_4,sip_iskonto_5,sip_iskonto_6,sip_masraf_1,sip_masraf_2,sip_masraf_3,sip_masraf_4,sip_vergi_pntr,sip_vergi,sip_masvergi_pntr,sip_masvergi,sip_opno,sip_aciklama,sip_aciklama2,sip_depono,sip_OnaylayanKulNo,sip_vergisiz_fl,sip_kapat_fl,sip_promosyon_fl,sip_cari_sormerk,sip_stok_sormerk,sip_cari_grupno,sip_doviz_cinsi,sip_doviz_kuru,sip_alt_doviz_kuru,sip_adresno,sip_teslimturu,sip_cagrilabilir_fl,sip_prosiprecDbId,sip_prosiprecrecI,sip_iskonto1,sip_iskonto2,sip_iskonto3,sip_iskonto4,sip_iskonto5,sip_iskonto6,sip_masraf1,sip_masraf2,sip_masraf3,sip_masraf4,sip_isk1,sip_isk2,sip_isk3,sip_isk4,sip_isk5,sip_isk6,sip_mas1,sip_mas2,sip_mas3,sip_mas4,sip_Exp_Imp_Kodu,sip_kar_orani,sip_durumu,sip_stalRecId_DBCno,sip_stalRecId_RECno,sip_planlananmiktar,sip_teklifRecId_DBCno,sip_teklifRecId_RECno,sip_parti_kodu,sip_lot_no,sip_projekodu,sip_fiyat_liste_no,sip_Otv_Pntr,sip_Otv_Vergi,sip_otvtutari,sip_OtvVergisiz_Fl,sip_paket_kod,sip_RezRecId_DBCno,sip_RezRecId_RECno,sip_harekettipi,sip_yetkili_recid_dbcno,sip_yetkili_recid_recno,sip_kapatmanedenkod,sip_gecerlilik_tarihi,sip_onodeme_evrak_tip,sip_onodeme_evrak_seri,sip_onodeme_evrak_sira,sip_rezervasyon_miktari,sip_rezerveden_teslim_edilen) VALUES(0,0,0,0,21,0,0,0,0,1,getdate(),1,getdate(),N'',N'',N'',0,0,(select convert(varchar(10),GETDATE(),120)),(select convert(varchar(10),GETDATE(),120)),0,0,N'" + ficheno_new_seri + "'," + ficheno_new_sira + "," + linenr + ",N'',(select convert(varchar(10),GETDATE(),120)),N'" + sendingOrderDto.sip_satici_kod + "',N'" + sendingOrderDto.sip_musteri_kod + "',N'" + sendingOrderDto.sip_stok_kod + "'," + sendingOrderDto.sip_b_fiyat + "," + sendingOrderDto.sip_miktar + ",1,0," + sendingOrderDto.sip_tutar + "," + sendingOrderDto.sip_iskonto1 + "," + "0" + "," + "0" + "," + "0" + "," + "0" + "," + "0" + ",0,0,0,0,1,0,0,0,'" + odemePlaniNo + "',N'" + sendingOrderDto.sip_aciklama + "',N'','" + sendingOrderDto.sip_depono + "',0,0,0,0,N'" + sip_mesmercode + "',N'" + sip_mesmercode + "',0,0,1.000000000000,1.000000000000,0,N'',1,0,0,   0,1,1,1,1,1,1,1,1,1 ,0,0,0,0,0,0,0,0,0,0,N'',0,0,0,0,0,0,0,N'',0,N'" + sip_projekodu + "',0,0,0,0,0,N'',0,0,0,0,0,N'',(select convert(varchar(10),GETDATE(),120)),0,N'',0,0,0)";
+            string query_line = "INSERT INTO " + _DB_Name + "..SIPARISLER  ( sip_RECid_DBCno,sip_RECid_RECno,sip_SpecRECno,sip_iptal,sip_fileid,sip_hidden,sip_kilitli,sip_degisti,sip_checksum,sip_create_user,sip_create_date,sip_lastup_user,sip_lastup_date,sip_special1,sip_special2,sip_special3,sip_firmano,sip_subeno,sip_tarih,sip_teslim_tarih,sip_tip,sip_cins,sip_evrakno_seri,sip_evrakno_sira,sip_satirno,sip_belgeno,sip_belge_tarih,sip_satici_kod,sip_musteri_kod,sip_stok_kod,sip_b_fiyat,sip_miktar,sip_birim_pntr,sip_teslim_miktar,sip_tutar,sip_iskonto_1,sip_iskonto_2,sip_iskonto_3,sip_iskonto_4,sip_iskonto_5,sip_iskonto_6,sip_masraf_1,sip_masraf_2,sip_masraf_3,sip_masraf_4,sip_vergi_pntr,sip_vergi,sip_masvergi_pntr,sip_masvergi,sip_opno,sip_aciklama,sip_aciklama2,sip_depono,sip_OnaylayanKulNo,sip_vergisiz_fl,sip_kapat_fl,sip_promosyon_fl,sip_cari_sormerk,sip_stok_sormerk,sip_cari_grupno,sip_doviz_cinsi,sip_doviz_kuru,sip_alt_doviz_kuru,sip_adresno,sip_teslimturu,sip_cagrilabilir_fl,sip_prosiprecDbId,sip_prosiprecrecI,sip_iskonto1,sip_iskonto2,sip_iskonto3,sip_iskonto4,sip_iskonto5,sip_iskonto6,sip_masraf1,sip_masraf2,sip_masraf3,sip_masraf4,sip_isk1,sip_isk2,sip_isk3,sip_isk4,sip_isk5,sip_isk6,sip_mas1,sip_mas2,sip_mas3,sip_mas4,sip_Exp_Imp_Kodu,sip_kar_orani,sip_durumu,sip_stalRecId_DBCno,sip_stalRecId_RECno,sip_planlananmiktar,sip_teklifRecId_DBCno,sip_teklifRecId_RECno,sip_parti_kodu,sip_lot_no,sip_projekodu,sip_fiyat_liste_no,sip_Otv_Pntr,sip_Otv_Vergi,sip_otvtutari,sip_OtvVergisiz_Fl,sip_paket_kod,sip_RezRecId_DBCno,sip_RezRecId_RECno,sip_harekettipi,sip_yetkili_recid_dbcno,sip_yetkili_recid_recno,sip_kapatmanedenkod,sip_gecerlilik_tarihi,sip_onodeme_evrak_tip,sip_onodeme_evrak_seri,sip_onodeme_evrak_sira,sip_rezervasyon_miktari,sip_rezerveden_teslim_edilen) VALUES(0,0,0,0,21,0,0,0,0,1,getdate(),1,getdate(),N'',N'',N'',0,0,(select convert(varchar(10),GETDATE(),120)),(select convert(varchar(10),GETDATE(),120)),0,0,N'" + ficheno_new_seri + "'," + ficheno_new_sira + "," + linenr + ",N'',(select convert(varchar(10),GETDATE(),120)),N'" + sendingOrderDto.sip_satici_kod + "',N'" + sendingOrderDto.sip_musteri_kod + "',N'" + sendingOrderDto.sip_stok_kod + "'," + sendingOrderDto.sip_b_fiyat + "," + sendingOrderDto.sip_miktar + ",1,0," + sendingOrderDto.sip_tutar + "," + sendingOrderDto.sip_iskonto1 + "," + "0" + "," + "0" + "," + "0" + "," + "0" + "," + "0" + ",0,0,0,0,1,0,0,0,'" + odemePlaniNo + "',N'" + sendingOrderDto.sip_aciklama + "',N'','" + sendingOrderDto.sip_depono + "',0,0,0,0,N'" + sip_mesmercode + "',N'" + sip_mesmercode + "',0,0,1.000000000000,1.7015,0,N'',1,0,0,   0,1,1,1,1,1,1,1,1,1 ,0,0,0,0,0,0,0,0,0,0,N'',0,0,0,0,0,0,0,N'',0,N'" + sip_projekodu + "',0,0,0,0,0,N'',0,0,0,0,0,N'',(select convert(varchar(10),GETDATE(),120)),0,N'',0,0,0)";
 
 
-           
+
 
             command.Parameters.AddWithValue("@ficheno_new_seri", ficheno_new_seri);
             command.Parameters.AddWithValue("@ficheno_new_sira", ficheno_new_sira);

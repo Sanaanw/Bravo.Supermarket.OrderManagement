@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5BC0409E-3C5E-43EB-833B-B42787EC948B}|Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj|c:\\users\\asus\\onedrive\\desktop\\bravo.supermarket.ordermanagement\\bravo.supermarket.siparis\\bravo.supermarket.api\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BC0409E-3C5E-43EB-833B-B42787EC948B}|Bravo.Supermarket.API\\Bravo.Supermarket.API.csproj|solutionrelative:bravo.supermarket.api\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +14,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Data\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "Bravo.Supermarket.API\\Data\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\ASUS\\OneDrive\\Desktop\\Bravo.Supermarket.OrderManagement\\Bravo.Supermarket.Siparis\\Bravo.Supermarket.API\\Data\\AppDbContext.cs",
+              "RelativeToolTip": "Bravo.Supermarket.API\\Data\\AppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-05T14:02:26.189Z",
+              "EditorCaption": ""
             }
           ]
         }
