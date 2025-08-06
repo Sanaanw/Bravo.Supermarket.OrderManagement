@@ -23,6 +23,8 @@ namespace BravoSupermarket.Siparis.WinForm
         private ListBox listBox1;
         private ListBox listBox2;
         private OpenFileDialog openFileDialog1;
+        private Label labelLoading;
+        List<string> files = new List<string>();
 
         public Form1()
         {
@@ -33,10 +35,12 @@ namespace BravoSupermarket.Siparis.WinForm
             };
             _httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             openFileDialog1.Filter = "XML files (*.xml)|*.xml";
             openFileDialog1.Multiselect = true;
 
@@ -47,7 +51,8 @@ namespace BravoSupermarket.Siparis.WinForm
 
             foreach (var filePath in openFileDialog1.FileNames)
             {
-                listBox1.Items.Add(filePath);
+                files.Add(filePath);
+                listBox1.Items.Add(Path.GetFileName(filePath));
             }
         }
 
@@ -60,12 +65,16 @@ namespace BravoSupermarket.Siparis.WinForm
                 return;
             }
 
+            button2.Enabled = false;
+            labelLoading.Visible = true;
+            Refresh();
+
             try
             {
                 string mesmerCode = textBox1.Text;
 
 
-                foreach (var item in listBox1.Items)
+                foreach (var item in files)
                 {
 
                     string filePath = item.ToString();
@@ -83,7 +92,7 @@ namespace BravoSupermarket.Siparis.WinForm
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
 
-                        listBox2.Items.Add(filePath);
+                        listBox2.Items.Add(Path.GetFileName(filePath));
 
                         MessageBox.Show("Sifariş uğurla göndərildi!\n" + responseBody,
                                         "Uğurlu", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -103,6 +112,13 @@ namespace BravoSupermarket.Siparis.WinForm
             {
                 MessageBox.Show($"Xəta baş verdi: {ex.Message}", "Xəta", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            finally
+            {
+                labelLoading.Visible = false;
+                button2.Enabled = true;
+            }
+
         }
 
 
@@ -207,6 +223,18 @@ namespace BravoSupermarket.Siparis.WinForm
             Name = "Form1";
             Text = "XML to Excel Parser";
             ResumeLayout(false);
+
+            // labelLoading
+            labelLoading = new Label();
+            labelLoading.Text = "Göndərilir...";
+            labelLoading.Font = new Font("Microsoft Sans Serif", 16, FontStyle.Bold);
+            labelLoading.ForeColor = Color.DarkBlue;
+            labelLoading.AutoSize = true;
+            labelLoading.Visible = false;
+            labelLoading.Location = new Point((ClientSize.Width - 200) / 2, (ClientSize.Height - 30) / 2);
+            Controls.Add(labelLoading);
+            labelLoading.BringToFront();
+
         }
 
 

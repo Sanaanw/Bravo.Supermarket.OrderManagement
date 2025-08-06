@@ -138,9 +138,14 @@ namespace Bravo.Supermarket.API.Controllers
 
 
 
-                            float Getting_Iskonto = 10;
+
+
+
 
                             //Getting Iskonto1
+
+                            float Getting_Iskonto = 10;
+
                             string iskontoQuery = $@"
                                   SELECT cari_POS_ongIskOran 
                                       FROM {_DB_Name}..CARI_HESAPLAR 
@@ -233,7 +238,7 @@ namespace Bravo.Supermarket.API.Controllers
             var sqlreader = command.ExecuteReader();
             sqlreader.Close();
 
-            // Update əməliyyatı
+            // Updating
             string query_rec = "UPDATE " + _DB_Name + "..SIPARISLER SET sip_RECid_RECno = sip_RECno where sip_tip = 0 and sip_evrakno_sira = '" + ficheno_new_sira + "' and sip_evrakno_seri = N'" + ficheno_new_seri + "'";
 
             command.Parameters.Clear();

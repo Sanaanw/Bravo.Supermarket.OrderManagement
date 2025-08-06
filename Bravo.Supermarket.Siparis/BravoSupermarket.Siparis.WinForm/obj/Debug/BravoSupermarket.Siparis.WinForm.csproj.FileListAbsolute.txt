@@ -126,3 +126,4 @@ C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermark
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSup.971BBE8A.Up2Date
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.exe
 C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.pdb
+C:\Users\ASUS\OneDrive\Desktop\Bravo.Supermarket.OrderManagement\Bravo.Supermarket.Siparis\BravoSupermarket.Siparis.WinForm\obj\Debug\BravoSupermarket.Siparis.WinForm.exe.config
