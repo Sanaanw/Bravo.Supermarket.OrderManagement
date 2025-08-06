@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Text.Json;
 using System.Xml;
 
 namespace Bravo.Supermarket.API.Controllers
@@ -27,6 +28,8 @@ namespace Bravo.Supermarket.API.Controllers
             _sql = sql;
             _DB_Name = "MikroDB_V15_ARAN_2024";
         }
+
+        List<Dictionary<string, object>> allLinesList = new List<Dictionary<string, object>>();
 
         [HttpPost("ReceiveOrder")]
         public IActionResult ReceiveOrder([FromBody] OrderDto orderDto, string mesmer_code)
@@ -64,6 +67,12 @@ namespace Bravo.Supermarket.API.Controllers
                     try
                     {
                         int linenr = 0;
+
+                        string common_satici_kod = null;
+                        double common_depono = 0;
+                        string common_aciklama = null;
+                        string common_musteri_kod = null;
+
                         foreach (var line in orderDto.Lines)
                         {
                             var gettingBarkodTanimlar = _context.barkodTanimlari.FirstOrDefault(x => x.bar_kodu == line.EAN);
@@ -88,21 +97,19 @@ namespace Bravo.Supermarket.API.Controllers
                             //Getting Fiyat
 
                             string fiyatQuery = $@"
-    SELECT TOP 1 price FROM (
-        SELECT IT.sto_kod AS item_code, '' AS cl_specode, ROUND(ISNULL(PR.sfiyat_fiyati, 0), 4) AS price
-        FROM {_DB_Name}..STOK_SATIS_FIYAT_LISTELERI PR
-        LEFT JOIN {_DB_Name}..STOKLAR IT ON IT.sto_kod = PR.sfiyat_stokkod
-        WHERE PR.sfiyat_listesirano = 1 AND IT.sto_kod IS NOT NULL
+                                SELECT TOP 1 price FROM (
+                                SELECT IT.sto_kod AS item_code, '' AS cl_specode, ROUND(ISNULL(PR.sfiyat_fiyati, 0), 4) AS price
+                                FROM {_DB_Name}..STOK_SATIS_FIYAT_LISTELERI PR
+                                LEFT JOIN {_DB_Name}..STOKLAR IT ON IT.sto_kod = PR.sfiyat_stokkod
+                                WHERE PR.sfiyat_listesirano = 1 AND IT.sto_kod IS NOT NULL
 
-        UNION ALL
+                                UNION ALL
 
-        SELECT ST.sat_stok_kod AS item_code, ST.sat_cari_kod AS cl_specode, ROUND(ISNULL(ST.sat_brut_fiyat, 0), 4) AS price
-        FROM {_DB_Name}..SATIS_SARTLARI ST
-        WHERE GETDATE() BETWEEN ST.sat_basla_tarih AND ST.sat_bitis_tarih
-    ) AS V
-    WHERE V.item_code = N'" + gettingBarkodTanimlar.bar_stokkodu + @"' 
-      AND (V.cl_specode = N'" + orderDto.Header.OrderNumber + @"' OR V.cl_specode = '')
-";
+                      SELECT ST.sat_stok_kod AS item_code, ST.sat_cari_kod AS cl_specode, ROUND(ISNULL(ST.sat_brut_fiyat, 0), 4) AS price
+                      FROM {_DB_Name}..SATIS_SARTLARI ST
+                      WHERE GETDATE() BETWEEN ST.sat_basla_tarih AND ST.sat_bitis_tarih) AS V
+                      WHERE V.item_code = N'" + gettingBarkodTanimlar.bar_stokkodu + @"' 
+                      AND (V.cl_specode = N'" + orderDto.Header.OrderNumber + @"' OR V.cl_specode = '')";
 
                             double Getting_sip_b_fiyat = 0;
 
@@ -144,10 +151,10 @@ namespace Bravo.Supermarket.API.Controllers
 
                             //Getting Iskonto1
 
-                            float Getting_Iskonto = 10;
+                            float Getting_Iskonto = 0;
 
                             string iskontoQuery = $@"
-                                  SELECT cari_POS_ongIskOran 
+                                  SELECT TOP 1 cari_POS_ongIskOran 
                                       FROM {_DB_Name}..CARI_HESAPLAR 
                                            WHERE cari_kod LIKE N'%{gettingCariHesablar.cari_kod}%'";
 
@@ -169,11 +176,18 @@ namespace Bravo.Supermarket.API.Controllers
                                 sip_satici_kod = gettingCariHesapAdresleri.adr_temsilci_kodu,
                                 sip_b_fiyat = Getting_sip_b_fiyat,
                                 sip_tutar = Getting_sip_b_fiyat * line.OrderedQuantity,
-                                sip_iskonto1 = Getting_Iskonto==0?Getting_sip_b_fiyat:((Getting_sip_b_fiyat*Getting_Iskonto)/100),
+                                sip_iskonto1 = Getting_Iskonto == 0 ? 0 : ((Getting_sip_b_fiyat * line.OrderedQuantity * Getting_Iskonto) / 100),
                                 sip_depono = 2,
                                 sip_aciklama = orderDto.Header.OrderNumber,
                                 sip_musteri_kod = gettingCariHesablar.cari_kod
                             };
+
+                            common_satici_kod = sendingOrderDto.sip_satici_kod;
+                            common_depono = sendingOrderDto.sip_depono;
+                            common_aciklama = sendingOrderDto.sip_aciklama;
+                            common_musteri_kod = sendingOrderDto.sip_musteri_kod;
+
+
 
                             using (SqlCommand command = con_logo.CreateCommand())
                             {
@@ -189,10 +203,58 @@ namespace Bravo.Supermarket.API.Controllers
                                     Getting_cariOdemePlani,
                                     command);
                             }
+
+                            var lineDict = new Dictionary<string, object?>
+    {
+        { "sip_stok_kod", sendingOrderDto.sip_stok_kod },
+        { "sip_miktar", sendingOrderDto.sip_miktar },
+        { "sip_b_fiyat", sendingOrderDto.sip_b_fiyat },
+        { "sip_tutar", sendingOrderDto.sip_tutar },
+        { "sip_iskonto1", sendingOrderDto.sip_iskonto1 }
+    };
+
+                            allLinesList.Add(lineDict);
+
+                        }
+
+                        var jsonStructure = new Dictionary<string, object?>
+{
+    { "header", new Dictionary<string, object?>
+        {
+            { "sip_satici_kod", common_satici_kod },
+            { "sip_depono", common_depono },
+            { "sip_aciklama", common_aciklama },
+            { "sip_musteri_kod", common_musteri_kod }
+        }
+    },
+    { "lines", allLinesList }
+};
+                        //Serialize json
+                        string jsonResult = JsonSerializer.Serialize(jsonStructure, new JsonSerializerOptions
+                        {
+                            WriteIndented = true,
+                            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                        });
+
+
+                        string insertJsonQuery = $@"
+                          INSERT INTO Tinda..TN_BRAVO_ORDERS_SEND_STATUS
+                          (FICHENO_SERI, FICHENO_SIRA, CREATE_DATE, _JSON) VALUES 
+                          (@seri, @sira, @date, @json)";
+
+                        using (SqlCommand logCommand = new SqlCommand(insertJsonQuery, con_logo, transaction))
+                        {
+                            logCommand.Parameters.AddWithValue("@seri", ficheno_new_seri);
+                            logCommand.Parameters.AddWithValue("@sira", ficheno_new_sira);
+                            logCommand.Parameters.AddWithValue("@date", DateTime.Now);
+                            logCommand.Parameters.AddWithValue("@json", jsonResult);
+
+                            logCommand.ExecuteNonQuery();
                         }
 
                         transaction.Commit();
                         return Ok();
+
                     }
                     catch (Exception ex)
                     {
