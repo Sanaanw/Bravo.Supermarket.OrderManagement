@@ -75,23 +75,50 @@ namespace Bravo.Supermarket.API.Controllers
 
                         foreach (var line in orderDto.Lines)
                         {
-                            var gettingBarkodTanimlar = _context.barkodTanimlari.FirstOrDefault(x => x.bar_kodu == line.EAN);
-                            if (gettingBarkodTanimlar == null)
-                                return BadRequest("Barkod tapılmadı.");
-
-                            var gettingCariHesablar = _context.CARI_HESAPLAR
-                                .FirstOrDefault(x => x.cari_unvan1 != null && x.cari_unvan1.Contains("2027") && x.cari_unvan1.Contains("Bravo"));
-
-                            if (gettingCariHesablar == null)
-                                return BadRequest("Cari Hesab tapılmadı.");
-
-                            var gettingCariHesapAdresleri = _context.CARI_HESAP_ADRESLERI
-                                .FirstOrDefault(x => x.adr_cari_kod == gettingCariHesablar.cari_kod);
-
-                            if (gettingCariHesapAdresleri == null)
-                                return BadRequest("Cari Hesap Adresləri tapılmadı.");
 
 
+
+                            string barkodTanimQuery = $"SELECT TOP 1 bar_stokkodu FROM {_DB_Name}..BARKOD_TANIMLARI WHERE bar_kodu = '{line.EAN}'";
+
+                            string gettingBarkodTanimlari_barKod = null;
+                            using (SqlCommand fiyatCmd = new SqlCommand(barkodTanimQuery, con_logo, transaction))
+                            {
+                                object result = fiyatCmd.ExecuteScalar();
+
+                                if (result != null && result != DBNull.Value)
+                                {
+                                    gettingBarkodTanimlari_barKod = result.ToString();
+                                }
+                            }
+
+
+                            string cariHesablarQuery = $"SELECT TOP 1 cari_kod FROM {_DB_Name}..CARI_HESAPLAR WHERE cari_unvan1 IS NOT NULL AND cari_unvan1 LIKE '%2027%' AND cari_unvan1 LIKE '%Bravo%'";
+                            string gettingCariHesablar_CariKod = null;
+                            using (SqlCommand fiyatCmd = new SqlCommand(cariHesablarQuery, con_logo, transaction))
+                            {
+                                object result = fiyatCmd.ExecuteScalar();
+
+                                if (result != null && result != DBNull.Value)
+                                {
+                                    gettingCariHesablar_CariKod = result.ToString();
+                                }
+                            }
+
+
+                            string cariHesapAdresleriQuery = $"SELECT TOP 1 adr_temsilci_kodu FROM {_DB_Name}..CARI_HESAP_ADRESLERI WHERE adr_cari_kod = @CariKod";
+
+                            string gettingCariHesapAdresleri_AdrTemsilciKod = null;
+                            using (SqlCommand fiyatCmd = new SqlCommand(cariHesapAdresleriQuery, con_logo, transaction))
+                            {
+                                fiyatCmd.Parameters.AddWithValue("@CariKod", gettingCariHesablar_CariKod);
+
+                                object result = fiyatCmd.ExecuteScalar();
+
+                                if (result != null && result != DBNull.Value)
+                                {
+                                    gettingCariHesapAdresleri_AdrTemsilciKod = result.ToString();
+                                }
+                            }
 
 
                             //Getting Fiyat
@@ -108,7 +135,7 @@ namespace Bravo.Supermarket.API.Controllers
                       SELECT ST.sat_stok_kod AS item_code, ST.sat_cari_kod AS cl_specode, ROUND(ISNULL(ST.sat_brut_fiyat, 0), 4) AS price
                       FROM {_DB_Name}..SATIS_SARTLARI ST
                       WHERE GETDATE() BETWEEN ST.sat_basla_tarih AND ST.sat_bitis_tarih) AS V
-                      WHERE V.item_code = N'" + gettingBarkodTanimlar.bar_stokkodu + @"' 
+                      WHERE V.item_code = N'" + gettingBarkodTanimlari_barKod + @"' 
                       AND (V.cl_specode = N'" + orderDto.Header.OrderNumber + @"' OR V.cl_specode = '')";
 
                             double Getting_sip_b_fiyat = 0;
@@ -131,7 +158,7 @@ namespace Bravo.Supermarket.API.Controllers
                             string cariOdemePlaniquery = $@"
                                     SELECT TOP 1 cari_odemeplan_no 
                                    FROM {_DB_Name}..CARI_HESAPLAR 
-                                     WHERE cari_kod LIKE N'%{gettingCariHesablar.cari_kod}%'";
+                                     WHERE cari_kod LIKE N'%{gettingCariHesablar_CariKod}%'";
 
 
                             using (SqlCommand cariOdemePlaniCmd = new SqlCommand(cariOdemePlaniquery, con_logo, transaction))
@@ -156,7 +183,7 @@ namespace Bravo.Supermarket.API.Controllers
                             string iskontoQuery = $@"
                                   SELECT TOP 1 cari_POS_ongIskOran 
                                       FROM {_DB_Name}..CARI_HESAPLAR 
-                                           WHERE cari_kod LIKE N'%{gettingCariHesablar.cari_kod}%'";
+                                           WHERE cari_kod LIKE N'%{gettingCariHesablar_CariKod}%'";
 
 
                             using (SqlCommand iskontoCmd = new SqlCommand(iskontoQuery, con_logo, transaction))
@@ -171,15 +198,15 @@ namespace Bravo.Supermarket.API.Controllers
 
                             SendingOrderDto sendingOrderDto = new SendingOrderDto
                             {
-                                sip_stok_kod = gettingBarkodTanimlar.bar_stokkodu,
+                                sip_stok_kod = gettingBarkodTanimlari_barKod,
                                 sip_miktar = line.OrderedQuantity,
-                                sip_satici_kod = gettingCariHesapAdresleri.adr_temsilci_kodu,
+                                sip_satici_kod = gettingCariHesapAdresleri_AdrTemsilciKod,
                                 sip_b_fiyat = Getting_sip_b_fiyat,
                                 sip_tutar = Getting_sip_b_fiyat * line.OrderedQuantity,
                                 sip_iskonto1 = Getting_Iskonto == 0 ? 0 : ((Getting_sip_b_fiyat * line.OrderedQuantity * Getting_Iskonto) / 100),
                                 sip_depono = 2,
                                 sip_aciklama = orderDto.Header.OrderNumber,
-                                sip_musteri_kod = gettingCariHesablar.cari_kod
+                                sip_musteri_kod = gettingCariHesablar_CariKod
                             };
 
                             common_satici_kod = sendingOrderDto.sip_satici_kod;

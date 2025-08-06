@@ -5,16 +5,15 @@ namespace Bravo.Supermarket.API.Data
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+           : base(options)
+        {
+        }
         public DbSet<BarkodTanimlari> barkodTanimlari { get; set; }
         public DbSet<CARI_HESAP_ADRESLERI> CARI_HESAP_ADRESLERI { get; set; }
         public DbSet<CARI_HESAPLAR> CARI_HESAPLAR { get; set; }
         public DbSet<SIPARISLER> SIPARISLER { get; set; }
 
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-         
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
